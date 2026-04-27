@@ -19,7 +19,7 @@ def load_data(file):
 # =========================
 # APP CONFIG
 # =========================
-st.set_page_config(page_title="Sales Dashboard", layout="wide", page_icon="📊")
+st.set_page_config(page_title="Sales Ranking", layout="wide", page_icon="📊")
 
 # Columnas clave
 nombre        = "Member"
