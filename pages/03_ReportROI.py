@@ -6,18 +6,10 @@ from fpdf import FPDF
 import os
 from datetime import date
 
-st.set_page_config(page_title="ROI Calculator", layout="wide", page_icon="💰")
+st.set_page_config(page_title="Reporte ROI", layout="wide", page_icon="💰")
 
 st.title("💰 Calculadora ROI - Soluciones PLC")
 st.caption("Genera un reporte de retorno de inversion para tu cliente")
-
-# =========================
-# FUNCION LIMPIEZA UNICODE
-# =========================
-def L(texto):
-    if not isinstance(texto, str):
-        texto = str(texto)
-    return texto  # DejaVu soporta todo, no necesitamos limpiar
 
 # =========================
 # DATOS DEL CLIENTE
@@ -37,47 +29,39 @@ with col3:
 st.divider()
 
 # =========================
-# TU SOLUCION (INVERSION)
+# TU SOLUCION
 # =========================
 st.subheader("🔧 Tu Solución - Inversión Total")
 col1, col2 = st.columns(2)
-
 with col1:
     costo_plc          = st.number_input("Costo PLC + componentes (MXN)", min_value=0, value=80000, step=1000)
     costo_ingenieria   = st.number_input("Ingeniería e instalación (MXN)", min_value=0, value=25000, step=1000)
     costo_capacitacion = st.number_input("Capacitación (MXN)", min_value=0, value=8000, step=500)
-
 with col2:
     descripcion_solucion = st.text_area("Descripción de la solución",
-        placeholder="PLC Allen Bradley + panel HMI para control de línea de ensamble...",
+        placeholder="PLC KV-X500 Keynece + panel HMI VT5 para control de línea de ensamble...",
         height=120)
 
 inversion_total = costo_plc + costo_ingenieria + costo_capacitacion
 st.metric("💼 Inversión Total", f"${inversion_total:,.0f} MXN")
-
 st.divider()
 
 # =========================
 # SITUACION ACTUAL
 # =========================
 st.subheader("⚠️ Situación Actual del Cliente - Costos Sin Automatizar")
-
 col1, col2 = st.columns(2)
-
 with col1:
     st.markdown("**Reclamos de Calidad**")
     num_reclamos     = st.number_input("Reclamos por año", min_value=0, value=12, step=1)
     costo_reclamo    = st.number_input("Costo promedio por reclamo (MXN)", min_value=0, value=15000, step=500)
-
     st.markdown("**Daño a Equipos**")
     num_incidentes   = st.number_input("Incidentes de daño a equipo por año", min_value=0, value=3, step=1)
     costo_incidente  = st.number_input("Costo promedio por incidente (MXN)", min_value=0, value=20000, step=1000)
-
 with col2:
     st.markdown("**Paros de Producción**")
     horas_paro_mes   = st.number_input("Horas de paro al mes", min_value=0.0, value=8.0, step=0.5)
     costo_hora_paro  = st.number_input("Costo por hora de paro (MXN)", min_value=0, value=3500, step=500)
-
     st.markdown("**Mano de Obra Manual**")
     num_operadores   = st.number_input("Operadores que reemplaza la solución", min_value=0, value=2, step=1)
     salario_operador = st.number_input("Salario mensual por operador (MXN)", min_value=0, value=8500, step=500)
@@ -108,17 +92,14 @@ roi_3yr = (((ahorro_total_anual * 3) - inversion_total) / inversion_total * 100)
 # RESULTADOS
 # =========================
 st.subheader("📊 Resultados del ROI")
-
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Ahorro Anual Total",  f"${ahorro_total_anual:,.0f} MXN")
 col2.metric("Payback",             f"{payback_meses:.1f} meses")
 col3.metric("ROI a 1 año",         f"{roi_1yr:.0f}%")
 col4.metric("ROI a 3 años",        f"{roi_3yr:.0f}%")
-
 st.divider()
 
 col1, col2 = st.columns(2)
-
 with col1:
     st.markdown("**Desglose de Ahorros Anuales**")
     desglose = pd.DataFrame({
@@ -127,7 +108,7 @@ with col1:
     })
     fig1 = px.bar(desglose, x="Categoría", y="Ahorro (MXN)",
                   color="Categoría", text_auto=True,
-                  color_discrete_sequence=["#2ecc71","#3498db","#f39c12","#e74c3c"])
+                  color_discrete_sequence=["#1a1a1a","#c20000","#444444","#888888"])
     fig1.update_traces(texttemplate="$%{y:,.0f}", textposition="outside")
     fig1.update_layout(showlegend=False)
     st.plotly_chart(fig1, use_container_width=True)
@@ -137,18 +118,16 @@ with col2:
     anos = [0, 1, 2, 3]
     ahorro_acum  = [0, ahorro_total_anual, ahorro_total_anual*2, ahorro_total_anual*3]
     inversion_ln = [inversion_total]*4
-
     fig2 = go.Figure()
     fig2.add_trace(go.Scatter(x=anos, y=ahorro_acum, name="Ahorro acumulado",
-                              line=dict(color="#2ecc71", width=3),
-                              fill="tozeroy", fillcolor="rgba(46,204,113,0.1)"))
+                              line=dict(color="#c20000", width=3),
+                              fill="tozeroy", fillcolor="rgba(194,0,0,0.1)"))
     fig2.add_trace(go.Scatter(x=anos, y=inversion_ln, name="Inversión",
-                              line=dict(color="#e74c3c", width=2, dash="dash")))
+                              line=dict(color="#1a1a1a", width=2, dash="dash")))
     fig2.update_layout(xaxis_title="Año", yaxis_title="MXN", yaxis_tickformat="$,.0f")
     st.plotly_chart(fig2, use_container_width=True)
 
 st.divider()
-
 st.markdown("**Resumen Financiero**")
 resumen = pd.DataFrame({
     "Concepto": [
@@ -167,9 +146,7 @@ resumen = pd.DataFrame({
         "AHORRO TOTAL ANUAL",
         "INVERSIÓN TOTAL",
         "PAYBACK",
-        "ROI AÑO 1",
-        "ROI AÑO 2",
-        "ROI AÑO 3",
+        "ROI AÑO 1", "ROI AÑO 2", "ROI AÑO 3",
     ],
     "Monto (MXN)": [
         f"${costo_reclamos_anual:,.0f}",
@@ -187,157 +164,216 @@ resumen = pd.DataFrame({
         f"${ahorro_total_anual:,.0f}",
         f"${inversion_total:,.0f}",
         f"{payback_meses:.1f} meses",
-        f"{roi_1yr:.0f}%",
-        f"{roi_2yr:.0f}%",
-        f"{roi_3yr:.0f}%",
+        f"{roi_1yr:.0f}%", f"{roi_2yr:.0f}%", f"{roi_3yr:.0f}%",
     ]
 })
 st.dataframe(resumen, use_container_width=True, hide_index=True)
-
 st.divider()
 
 # =========================
 # GENERADOR DE PDF
 # =========================
 st.subheader("📄 Generar Reporte PDF")
-
 col1, col2 = st.columns(2)
 with col1:
-    empresa_nombre = st.text_input("Tu empresa (para el PDF)", value="Keyence de Mexico SA de CV")
-    empresa_email  = st.text_input("Tu email de contacto", value="ventas@keyence.com.mx")
+    empresa_nombre = st.text_input("Tu empresa (para el PDF)", value="Keyence Mexico")
+    empresa_email  = st.text_input("Tu email de contacto", value="rloya@keyence.com")
 with col2:
-    empresa_tel  = st.text_input("Tu teléfono", value="+52 81 0000 0000")
+    empresa_tel = st.text_input("Tu teléfono", value="+52 81 1824 9158")
 
-if st.button("📥 Generar y Descargar PDF", type="primary"):
-    if not cliente_nombre:
-        st.warning("Escribe el nombre del cliente antes de generar el PDF.")
-    else:
-        # Logo fijo desde carpeta del proyecto
-        logo_path = "logo.png" if os.path.exists("logo.png") else None
+DEJAVU      = "DejaVu Sans Book.ttf"
+DEJAVU_BOLD = "DejaVu Sans Bold.ttf"
+NEGRO       = (20, 20, 20)
+ROJO        = (194, 0, 0)
+BLANCO      = (255, 255, 255)
+GRIS_CLARO  = (245, 245, 245)
+GRIS_TEXTO  = (100, 100, 100)
 
-        DEJAVU      = "DejaVu Sans Book.ttf"
-        DEJAVU_BOLD = "DejaVu Sans Bold.ttf"
+def make_pdf(cn, ci, cc, cc2, en, ee, et, fr,
+             cplc, cing, ccap, desc,
+             nr, cr, ni, coi, hpm, chp, nop, sop,
+             cra, cia, cpa, cma, ahr, ahi, ahp, ahmo, ata, inv, pb, r1, r2, r3):
 
-        class PDF(FPDF):
-            def header(self):
-                if logo_path:
-                    self.image(logo_path, x=10, y=6, w=30, h=14)
-                self.set_font("DejaVu", "B", 14)
-                self.set_text_color(30, 30, 30)
-                self.cell(0, 10, empresa_nombre, align="R", new_x="LMARGIN", new_y="NEXT")
-                self.set_font("DejaVu", "", 9)
-                self.set_text_color(100, 100, 100)
-                self.cell(0, 5, f"{empresa_email}  |  {empresa_tel}", align="R", new_x="LMARGIN", new_y="NEXT")
-                self.ln(4)
-                self.set_draw_color(46, 204, 113)
-                self.set_line_width(0.8)
-                self.line(10, self.get_y(), 200, self.get_y())
-                self.ln(4)
+    logo_path = "logo.png" if os.path.exists("logo.png") else None
 
-            def footer(self):
-                self.set_y(-15)
-                self.set_font("DejaVu", "", 8)
-                self.set_text_color(150, 150, 150)
-                self.cell(0, 10, f"Página {self.page_no()} — Reporte confidencial generado el {fecha_reporte}", align="C")
+    class PDF(FPDF):
+        def header(self):
+            # Fondo blanco para logo y datos
+            self.set_fill_color(*BLANCO)
+            self.rect(0, 0, 210, 24, "F")
+            # Logo sobre fondo blanco
+            if logo_path:
+                self.image(logo_path, x=8, y=4, w=40, h=12)
+            # Nombre empresa en negro
+            self.set_font("DejaVu", "B", 12)
+            self.set_text_color(*NEGRO)
+            self.set_y(4)
+            self.cell(0, 6, en, align="R", new_x="LMARGIN", new_y="NEXT")
+            self.set_font("DejaVu", "", 8)
+            self.set_text_color(*GRIS_TEXTO)
+            self.cell(0, 5, f"{ee}  |  {et}", align="R", new_x="LMARGIN", new_y="NEXT")
+            # Línea roja separadora
+            self.set_draw_color(*NEGRO)
+            self.set_line_width(1.2)
+            self.line(0, 20, 210, 20)
+            self.ln(6)
 
-        def section_title(pdf, title):
-            pdf.set_fill_color(46, 204, 113)
-            pdf.set_text_color(255, 255, 255)
-            pdf.set_font("DejaVu", "B", 11)
-            pdf.cell(0, 8, f"  {title}", fill=True, new_x="LMARGIN", new_y="NEXT")
-            pdf.ln(2)
+        def footer(self):
+            self.set_y(-13)
+            self.set_draw_color(*ROJO)
+            self.set_line_width(0.4)
+            self.line(10, self.get_y(), 200, self.get_y())
+            self.ln(1)
+            self.set_font("DejaVu", "", 7)
+            self.set_text_color(*GRIS_TEXTO)
+            self.cell(0, 5,
+                f"Reporte confidencial — {en}  |  Página {self.page_no()}  |  {fr}",
+                align="C")
+
+    def sec(pdf, title):
+        pdf.set_fill_color(*NEGRO)
+        pdf.set_text_color(*BLANCO)
+        pdf.set_font("DejaVu", "B", 10)
+        pdf.cell(0, 8, f"   {title}", fill=True, new_x="LMARGIN", new_y="NEXT")
+        pdf.ln(2)
+        pdf.set_text_color(*NEGRO)
+
+    def row(pdf, label, value, highlight=False, alt=False):
+        if highlight:
+            pdf.set_fill_color(*NEGRO)
+            pdf.set_text_color(*BLANCO)
+            pdf.set_font("DejaVu", "B", 10)
+        elif alt:
+            pdf.set_fill_color(*GRIS_CLARO)
             pdf.set_text_color(30, 30, 30)
-
-        def row_data(pdf, label, value, highlight=False):
-            if highlight:
-                pdf.set_fill_color(240, 255, 245)
-                pdf.set_font("DejaVu", "B", 10)
-            else:
-                pdf.set_fill_color(255, 255, 255)
-                pdf.set_font("DejaVu", "", 10)
-            pdf.cell(130, 7, f"  {label}", fill=highlight, border="B")
-            pdf.set_font("DejaVu", "B" if highlight else "", 10)
-            pdf.cell(0, 7, value, fill=highlight, border="B", align="R", new_x="LMARGIN", new_y="NEXT")
-
-        pdf = PDF()
-        pdf.add_font("DejaVu", "",  DEJAVU)
-        pdf.add_font("DejaVu", "B", DEJAVU_BOLD)
-        pdf.add_page()
-        pdf.set_auto_page_break(auto=True, margin=20)
-
-        # Título
-        pdf.set_font("DejaVu", "B", 20)
+            pdf.set_font("DejaVu", "", 10)
+        else:
+            pdf.set_fill_color(*BLANCO)
+            pdf.set_text_color(30, 30, 30)
+            pdf.set_font("DejaVu", "", 10)
+        pdf.cell(130, 7, f"  {label}", fill=True, border="B")
+        pdf.set_font("DejaVu", "B" if highlight else "", 10)
+        pdf.cell(0, 7, value, fill=True, border="B", align="R",
+                 new_x="LMARGIN", new_y="NEXT")
         pdf.set_text_color(30, 30, 30)
-        pdf.cell(0, 12, "Reporte de Retorno de Inversión", new_x="LMARGIN", new_y="NEXT", align="C")
-        pdf.set_font("DejaVu", "", 11)
-        pdf.set_text_color(80, 80, 80)
-        pdf.cell(0, 7, f"Preparado para: {cliente_nombre}", new_x="LMARGIN", new_y="NEXT", align="C")
-        pdf.cell(0, 7, f"{cliente_industria} — {cliente_ciudad}", new_x="LMARGIN", new_y="NEXT", align="C")
-        pdf.ln(6)
 
-        # Sección 1
-        section_title(pdf, "1. Solución Propuesta")
-        pdf.set_font("DejaVu", "", 10)
-        pdf.set_text_color(60, 60, 60)
-        pdf.multi_cell(0, 6, descripcion_solucion or "Solución de automatización con PLC.", new_x="LMARGIN", new_y="NEXT")
-        pdf.ln(3)
-        row_data(pdf, "Costo PLC + componentes",  f"${costo_plc:,.0f} MXN")
-        row_data(pdf, "Ingeniería e instalación",  f"${costo_ingenieria:,.0f} MXN")
-        row_data(pdf, "Capacitación",              f"${costo_capacitacion:,.0f} MXN")
-        row_data(pdf, "INVERSIÓN TOTAL",           f"${inversion_total:,.0f} MXN", highlight=True)
-        pdf.ln(5)
+    pdf = PDF()
+    pdf.add_font("DejaVu", "",  DEJAVU)
+    pdf.add_font("DejaVu", "B", DEJAVU_BOLD)
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=18)
 
-        # Sección 2
-        section_title(pdf, "2. Costos Actuales Sin Automatizar")
-        row_data(pdf, f"Reclamos de calidad ({num_reclamos}/año × ${costo_reclamo:,.0f})",         f"${costo_reclamos_anual:,.0f} MXN")
-        row_data(pdf, f"Daño a equipos ({num_incidentes}/año × ${costo_incidente:,.0f})",           f"${costo_incidentes_anual:,.0f} MXN")
-        row_data(pdf, f"Paros de producción ({horas_paro_mes}h/mes × ${costo_hora_paro:,.0f}/h)",  f"${costo_paros_anual:,.0f} MXN")
-        row_data(pdf, f"Mano de obra ({num_operadores} op. × ${salario_operador:,.0f}/mes)",        f"${costo_mano_obra_anual:,.0f} MXN")
-        row_data(pdf, "TOTAL COSTOS ANUALES",
-                 f"${costo_reclamos_anual+costo_incidentes_anual+costo_paros_anual+costo_mano_obra_anual:,.0f} MXN",
-                 highlight=True)
-        pdf.ln(5)
+    # Título
+    pdf.set_font("DejaVu", "B", 19)
+    pdf.set_text_color(20, 20, 20)
+    pdf.cell(0, 12, "Reporte de Retorno de Inversión", new_x="LMARGIN", new_y="NEXT", align="C")
+    pdf.set_draw_color(*ROJO)
+    pdf.set_line_width(0.6)
+    pdf.line(40, pdf.get_y(), 170, pdf.get_y())
+    pdf.ln(3)
+    pdf.set_font("DejaVu", "", 10)
+    pdf.set_text_color(80, 80, 80)
+    pdf.cell(0, 6, f"Preparado para: {cn}", new_x="LMARGIN", new_y="NEXT", align="C")
+    pdf.cell(0, 6, f"{ci} — {cc}", new_x="LMARGIN", new_y="NEXT", align="C")
+    pdf.ln(5)
 
-        # Sección 3
-        section_title(pdf, "3. Ahorros Proyectados con la Solución")
-        row_data(pdf, "Reducción de reclamos (80%)",       f"${ahorro_reclamos:,.0f} MXN/año")
-        row_data(pdf, "Reducción de daño a equipos (90%)", f"${ahorro_incidentes:,.0f} MXN/año")
-        row_data(pdf, "Reducción de paros (70%)",          f"${ahorro_paros:,.0f} MXN/año")
-        row_data(pdf, "Ahorro en mano de obra (100%)",     f"${ahorro_mano_obra:,.0f} MXN/año")
-        row_data(pdf, "AHORRO TOTAL ANUAL",                f"${ahorro_total_anual:,.0f} MXN", highlight=True)
-        pdf.ln(5)
+    # Sección 1
+    sec(pdf, "1. Solución Propuesta")
+    pdf.set_font("DejaVu", "", 9)
+    pdf.set_text_color(60, 60, 60)
+    pdf.multi_cell(0, 5, desc or "Solución de automatización con PLC.",
+                   new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(2)
+    row(pdf, "Costo PLC + componentes",  f"${cplc:,.0f} MXN", alt=True)
+    row(pdf, "Ingeniería e instalación",  f"${cing:,.0f} MXN")
+    row(pdf, "Capacitación",              f"${ccap:,.0f} MXN", alt=True)
+    row(pdf, "INVERSIÓN TOTAL",           f"${inv:,.0f} MXN", highlight=True)
+    pdf.ln(5)
 
-        # Sección 4
-        section_title(pdf, "4. Retorno de Inversión")
-        row_data(pdf, "Período de recuperación (Payback)", f"{payback_meses:.1f} meses")
-        row_data(pdf, "ROI al año 1",                      f"{roi_1yr:.0f}%")
-        row_data(pdf, "ROI al año 2",                      f"{roi_2yr:.0f}%")
-        row_data(pdf, "ROI al año 3",                      f"{roi_3yr:.0f}%", highlight=True)
-        pdf.ln(5)
+    # Sección 2
+    sec(pdf, "2. Costos Actuales Sin Automatizar")
+    row(pdf, f"Reclamos de calidad ({nr}/año × ${cr:,.0f})",        f"${cra:,.0f} MXN", alt=True)
+    row(pdf, f"Daño a equipos ({ni}/año × ${coi:,.0f})",            f"${cia:,.0f} MXN")
+    row(pdf, f"Paros de producción ({hpm}h/mes × ${chp:,.0f}/h)",   f"${cpa:,.0f} MXN", alt=True)
+    row(pdf, f"Mano de obra ({nop} op. × ${sop:,.0f}/mes)",         f"${cma:,.0f} MXN")
+    row(pdf, "TOTAL COSTOS ANUALES",
+        f"${cra+cia+cpa+cma:,.0f} MXN", highlight=True)
+    pdf.ln(5)
 
-        # Sección 5
-        section_title(pdf, "5. Conclusión")
-        pdf.set_font("DejaVu", "", 10)
-        pdf.set_text_color(60, 60, 60)
-        conclusion = (
-            f"La implementación de la solución propuesta para {cliente_nombre} representa una inversión "
-            f"de ${inversion_total:,.0f} MXN con un período de recuperación estimado de {payback_meses:.1f} meses. "
-            f"A partir del mes {int(payback_meses)+1}, la solución genera un ahorro neto de "
-            f"${ahorro_total_anual:,.0f} MXN anuales, representando un ROI de {roi_3yr:.0f}% al tercer año."
+    # Sección 3
+    sec(pdf, "3. Ahorros Proyectados con la Solución")
+    row(pdf, "Reducción de reclamos (80%)",       f"${ahr:,.0f} MXN/año", alt=True)
+    row(pdf, "Reducción de daño a equipos (90%)", f"${ahi:,.0f} MXN/año")
+    row(pdf, "Reducción de paros (70%)",          f"${ahp:,.0f} MXN/año", alt=True)
+    row(pdf, "Ahorro en mano de obra (100%)",     f"${ahmo:,.0f} MXN/año")
+    row(pdf, "AHORRO TOTAL ANUAL",                f"${ata:,.0f} MXN", highlight=True)
+    pdf.ln(5)
+
+    # Sección 4
+    sec(pdf, "4. Retorno de Inversión")
+    row(pdf, "Período de recuperación (Payback)", f"{pb:.1f} meses", alt=True)
+    row(pdf, "ROI al año 1",                      f"{r1:.0f}%")
+    row(pdf, "ROI al año 2",                      f"{r2:.0f}%", alt=True)
+    row(pdf, "ROI al año 3",                      f"{r3:.0f}%", highlight=True)
+    pdf.ln(5)
+
+    # Sección 5
+    sec(pdf, "5. Conclusión")
+    pdf.set_font("DejaVu", "", 9)
+    pdf.set_text_color(60, 60, 60)
+    conclusion = (
+        f"La implementación de la solución propuesta para {cn} representa una inversión "
+        f"de ${inv:,.0f} MXN con un período de recuperación estimado de {pb:.1f} meses. "
+        f"A partir del mes {int(pb)+1}, la solución genera un ahorro neto de "
+        f"${ata:,.0f} MXN anuales, representando un ROI de {r3:.0f}% al tercer año."
+    )
+    pdf.multi_cell(0, 5, conclusion)
+
+    return pdf
+
+# =========================
+# BOTONES PDF
+# =========================
+col1, col2 = st.columns(2)
+
+with col1:
+    if st.button("👁️ Vista previa con datos de ejemplo", use_container_width=True):
+        pdf = make_pdf(
+            "Herramental Monterrey SA", "Monterrey, NL", "Metalmecánica", "Ing. García",
+            empresa_nombre, empresa_email, empresa_tel, fecha_reporte,
+            80000, 25000, 8000,
+            "PLC Allen Bradley ControlLogix + panel HMI PanelView para control de línea de ensamble automatizada.",
+            12, 15000, 3, 20000, 8.0, 3500, 2, 8500,
+            180000, 60000, 336000, 204000,
+            144000, 54000, 235200, 204000, 637200,
+            113000, 2.1, 464, 1028, 1592
         )
-        pdf.multi_cell(0, 6, conclusion)
-
-        # Guardar y descargar
-        pdf_path = f"ROI_{cliente_nombre.replace(' ','_')}.pdf"
+        pdf_path = "ROI_Ejemplo.pdf"
         pdf.output(pdf_path)
-
         with open(pdf_path, "rb") as f:
-            st.download_button(
-                label="⬇️ Descargar PDF",
-                data=f,
-                file_name=pdf_path,
-                mime="application/pdf"
-            )
-
+            st.download_button("⬇️ Descargar PDF de ejemplo", data=f,
+                               file_name="ROI_Ejemplo.pdf", mime="application/pdf")
         os.remove(pdf_path)
-        st.success("✅ PDF generado correctamente")
+
+with col2:
+    if st.button("📥 Generar PDF con datos actuales", type="primary", use_container_width=True):
+        if not cliente_nombre:
+            st.warning("Escribe el nombre del cliente antes de generar el PDF.")
+        else:
+            pdf = make_pdf(
+                cliente_nombre, cliente_ciudad, cliente_industria, cliente_contacto,
+                empresa_nombre, empresa_email, empresa_tel, fecha_reporte,
+                costo_plc, costo_ingenieria, costo_capacitacion, descripcion_solucion,
+                num_reclamos, costo_reclamo, num_incidentes, costo_incidente,
+                horas_paro_mes, costo_hora_paro, num_operadores, salario_operador,
+                costo_reclamos_anual, costo_incidentes_anual, costo_paros_anual, costo_mano_obra_anual,
+                ahorro_reclamos, ahorro_incidentes, ahorro_paros, ahorro_mano_obra,
+                ahorro_total_anual, inversion_total, payback_meses, roi_1yr, roi_2yr, roi_3yr
+            )
+            pdf_path = f"ROI_{cliente_nombre.replace(' ','_')}.pdf"
+            pdf.output(pdf_path)
+            with open(pdf_path, "rb") as f:
+                st.download_button("⬇️ Descargar PDF", data=f,
+                                   file_name=pdf_path, mime="application/pdf")
+            os.remove(pdf_path)
+            st.success("✅ PDF generado correctamente")
