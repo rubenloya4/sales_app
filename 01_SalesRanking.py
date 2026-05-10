@@ -68,6 +68,10 @@ tab1, tab2, tab3 = st.tabs(["📊 Ranking General", "🏢 Por Oficina", "📋 Ta
 file = st.sidebar.file_uploader("📂 Carga archivo de ventas", type=["xlsx", "xlsm"])
 
 if file:
+    st.session_state["archivo"] = file
+
+if "archivo" in st.session_state:
+    file = st.session_state["archivo"]
     df_raw, df_pond, stats = load_data(file)
 
     # Merge
